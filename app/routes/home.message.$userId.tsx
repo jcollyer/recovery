@@ -1,6 +1,7 @@
 import { json, LoaderFunction, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { getUserById } from "~/utils/user.server";
+import { Portal } from "~/components/portal";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { userId } = params;
@@ -15,5 +16,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 export default function MessageModal() {
   const { recipient } = useLoaderData();
   const { profile } = recipient;
-  return <h2> Recipient: {profile.firstName}</h2>;
+  return (
+    <Portal wrapperId="message-modal">
+      <h2> Recipient: {profile.firstName}</h2>
+    </Portal>
+  );
 }
