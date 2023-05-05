@@ -1,12 +1,18 @@
-import { LoaderFunction } from "@remix-run/node";
+import { LoaderFunction, json } from "@remix-run/node";
+import { Outlet, useLoaderData } from '@remix-run/react';
 import { requireUserId } from "~/utils/auth.server";
+import { getOtherUsers } from '~/utils/user.server'
+import { Layout } from "~/components/layout";
+import { UserPanel } from "~/components/user-panel";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  await requireUserId(request);
-  return null;
+  const userId = await requireUserId(request)
+  const users = await getOtherUsers(userId)
+  return json({users});
 };
 
 export default function Logout() {
+  const { users } = useLoaderData()
   return (
     <div className="h-screen bg-slate-700 flex justify-center items-center">
       <form action="/logout" method="post">
@@ -17,9 +23,12 @@ export default function Logout() {
           Log out
         </button>
       </form>
-      <h2 className="text-blue-600 font-extrabold text-5xl">
-        logged in homepage
-      </h2>
+      <Layout>
+        <Outlet />
+        <div className="h-full flex">
+          <UserPanel users={users} />
+        </div>
+      </Layout>
     </div>
   );
 }
