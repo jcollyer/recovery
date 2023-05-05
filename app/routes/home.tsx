@@ -1,6 +1,6 @@
 import { LoaderFunction, json } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
-import { requireUserId } from "~/utils/auth.server";
+import { getUser, requireUserId } from "~/utils/auth.server";
 import { getOtherUsers } from "~/utils/user.server";
 import { getFilteredMessages, getRecentMessages } from "~/utils/messages.server";
 import { Layout } from "~/components/layout";
@@ -18,6 +18,7 @@ interface MessageWithProfile extends IMessage {
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await requireUserId(request);
+  const user = await getUser(request);
   const users = await getOtherUsers(userId);
   const url = new URL(request.url);
   const sort = url.searchParams.get('sort');
@@ -56,11 +57,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const messages = await getFilteredMessages(userId, sortOptions, textFilter);
 
-  return json({ users, messages, recentMessages });
+  return json({ users, messages, recentMessages, user });
 };
 
 export default function Logout() {
-  const { messages, users, recentMessages } = useLoaderData();
+  const { messages, users, recentMessages, user } = useLoaderData();
   return (
     <div className="h-screen bg-slate-700 flex justify-center items-center">
       <Layout>
@@ -68,7 +69,7 @@ export default function Logout() {
         <div className="h-full flex">
           <UserPanel users={users} />
           <div className="flex-1 flex flex-col">
-            <SearchBar />
+            <SearchBar profile={user.profile} />
             <div className="flex-1 flex">
               <div className="w-full p-10 flex flex-col gap-y-4">
                 {messages.map((message: MessageWithProfile) => (

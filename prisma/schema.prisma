@@ -12,7 +12,8 @@ datasource db {
 
 type Profile {
   firstName String
-  lastName String
+  lastName  String
+  role      String?
 }
 
 enum Emoji {

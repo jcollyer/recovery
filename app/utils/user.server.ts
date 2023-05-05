@@ -1,4 +1,4 @@
-// app/utils/user.server.ts
+import { Profile } from "@prisma/client";
 import bcrypt from 'bcryptjs'
 import type { RegisterForm } from './types.server'
 import { prisma } from './prisma.server'
@@ -38,3 +38,16 @@ export const getUserById = async (userId: string) => {
     }
   }) 
 }
+
+export const updateUser = async (userId: string, profile: Partial<Profile>) => {
+  await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      profile: {
+        update: profile,
+      },
+    },
+  });
+};

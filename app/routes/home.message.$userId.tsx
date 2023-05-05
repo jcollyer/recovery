@@ -10,7 +10,6 @@ import { SelectBox } from "~/components/select-box";
 import { colorMap, emojiMap } from "~/utils/constants";
 import { Message } from '~/components/Message';
 import { requireUserId } from '~/utils/auth.server';
-import { createKudo } from '~/utils/kudos.server';
 import { createMessage } from "~/utils/messages.server";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
