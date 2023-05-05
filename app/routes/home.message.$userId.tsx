@@ -1,14 +1,17 @@
-import { json, LoaderFunction, redirect } from "@remix-run/node";
+import { ActionFunction, json, LoaderFunction, redirect } from "@remix-run/node";
 import { UserCircle } from "~/components/user-circle";
 import { useState } from "react";
-import { MessageStyle } from "@prisma/client";
+import { Color, Emoji, MessageStyle } from "@prisma/client";
 import { useLoaderData, useActionData } from "@remix-run/react";
 import { getUserById } from "~/utils/user.server";
 import { getUser } from "~/utils/auth.server";
 import { Modal } from "~/components/modal";
 import { SelectBox } from "~/components/select-box";
 import { colorMap, emojiMap } from "~/utils/constants";
-import { Message } from '~/components/Message'
+import { Message } from '~/components/Message';
+import { requireUserId } from '~/utils/auth.server';
+import { createKudo } from '~/utils/kudos.server';
+import { createMessage } from "~/utils/messages.server";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { userId } = params;
@@ -22,6 +25,41 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   return json({ recipient, user });
 };
 
+export const action: ActionFunction = async ({ request }) => {
+  const userId = await requireUserId(request);
+
+  const form = await request.formData();
+  const message = form.get('message');
+  const backgroundColor = form.get('backgroundColor');
+  const textColor = form.get('textColor');
+  const emoji = form.get('emoji');
+  const recipientId = form.get('recipientId');
+
+  if (
+    typeof message !== 'string' ||
+    typeof recipientId !== 'string' ||
+    typeof backgroundColor !== 'string' ||
+    typeof textColor !== 'string' ||
+    typeof emoji !== 'string'
+  ) {
+    return json({ error: `Invalid Form Data` }, { status: 400 })
+  }
+  if (!message.length) {
+    return json({ error: `Please provide a message.` }, { status: 400 })
+  }
+  if (!recipientId.length) {
+    return json({ error: `No recipient found...` }, { status: 400 })
+  }
+
+  await createMessage(message, userId, recipientId, {
+    backgroundColor: backgroundColor as Color,
+    textColor: textColor as Color,
+    emoji: emoji as Emoji
+  });
+
+  return redirect('/home');
+
+}
 export default function MessageModal() {
   const actionData = useActionData();
   const [formError] = useState(actionData?.error || "");
