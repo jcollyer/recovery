@@ -6,7 +6,8 @@ import { Layout } from "~/components/layout";
 import { UserPanel } from "~/components/user-panel";
 import { getFilteredMessages } from "~/utils/messages.server";
 import { Message } from "~/components/message";
-import { Message as IMessage, Profile } from "@prisma/client";
+import { Message as IMessage, Profile, Prisma } from "@prisma/client";
+import { SearchBar } from '~/components/search-bar'
 
 interface MessageWithProfile extends IMessage {
   author: {
@@ -17,7 +18,41 @@ interface MessageWithProfile extends IMessage {
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await requireUserId(request);
   const users = await getOtherUsers(userId);
-  const messages = await getFilteredMessages(userId, {}, {});
+  const url = new URL(request.url);
+  const sort = url.searchParams.get('sort');
+  const filter = url.searchParams.get('filter');
+
+  let sortOptions: Prisma.MessageOrderByWithRelationInput = {}
+  if (sort) {
+    if (sort === 'date') {
+      sortOptions = { createdAt: 'desc' }
+    }
+    if (sort === 'sender') {
+      sortOptions = { author: { profile: { firstName: 'asc' } } }
+    }
+    if (sort === 'emoji') {
+      sortOptions = { style: { emoji: 'asc' } }
+    }
+  }
+
+  let textFilter: Prisma.MessageWhereInput = {};
+  if (filter) {
+    textFilter = {
+      OR: [
+        { message: { mode: 'insensitive', contains: filter } },
+        {
+          author: {
+            OR: [
+              { profile: { is: { firstName: { mode: 'insensitive', contains: filter } } } },
+              { profile: { is: { lastName: { mode: 'insensitive', contains: filter } } } },
+            ],
+          },
+        },
+      ],
+    }
+  }
+
+  const messages = await getFilteredMessages(userId, sortOptions, textFilter);
 
   return json({ users, messages });
 };
@@ -31,7 +66,7 @@ export default function Logout() {
         <div className="h-full flex">
           <UserPanel users={users} />
           <div className="flex-1 flex flex-col">
-            {/* Search Bar Goes Here */}
+            <SearchBar />
             <div className="flex-1 flex">
               <div className="w-full p-10 flex flex-col gap-y-4">
                 {messages.map((message: MessageWithProfile) => (
