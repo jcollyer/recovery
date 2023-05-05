@@ -110,7 +110,7 @@ export default function MessageModal() {
       <div className="text-xs font-semibold text-center tracking-wide text-red-500 w-full mb-2">
         {formError}
       </div>
-      <form method="post">
+      <form method="POST">
         <input type="hidden" value={recipient.id} name="recipientId" />
         <div className="flex flex-col md:flex-row gap-y-2 md:gap-y-0">
           <div className="text-center flex flex-col items-center gap-y-2 pr-8">

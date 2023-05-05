@@ -10,12 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-type Profile {
-  firstName String
-  lastName  String
-  role      String?
-}
-
 enum Emoji {
   THUMBSUP
   PARTY
@@ -34,6 +28,13 @@ enum Color {
   YELLOW
   BLUE
   WHITE
+}
+
+type Profile {
+  firstName      String
+  lastName       String
+  role           Role? @default(SUPPORTER)
+  profilePicture String?
 }
 
 type MessageStyle {

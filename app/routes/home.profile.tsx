@@ -1,6 +1,11 @@
 // app/routes/home/profile.tsx
 
-import { ActionFunction, json, LoaderFunction, redirect } from "@remix-run/node";
+import {
+  ActionFunction,
+  json,
+  LoaderFunction,
+  redirect,
+} from "@remix-run/node";
 import { useState } from "react";
 import { useLoaderData } from "@remix-run/react";
 import { Modal } from "~/components/modal";
@@ -9,6 +14,7 @@ import { getUser, requireUserId } from "~/utils/auth.server";
 import { validateName } from "~/utils/validators.server";
 import { roles } from "~/utils/constants";
 import { SelectBox } from "~/components/select-box";
+// import { ImageUploader } from "~/components/image-uploader";
 import { updateUser } from "~/utils/user.server";
 import type { Role } from "@prisma/client";
 
@@ -18,33 +24,36 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export const action: ActionFunction = async ({ request }) => {
-    const form = await request.formData();
-    const userId = await requireUserId(request);
-    let firstName = form.get('firstName');
-    let lastName = form.get('lastName');
-    let role = form.get('role');
- 
-    if (
-       typeof firstName !== 'string'
-       || typeof lastName !== 'string'
-       || typeof role !== 'string'
-    ) {
-       return json({ error: `Invalid Form Data` }, { status: 400 });
-    }
- 
-    const errors = {
-       firstName: validateName(firstName),
-       lastName: validateName(lastName),
-       role: validateName(role)
-    }
- 
-    if (Object.values(errors).some(Boolean))
-       return json({ errors, fields: { role, firstName, lastName } }, { status: 400 });
- 
-    await updateUser(userId, {firstName, lastName, role: role as Role});
- 
-    return redirect('/home')
- }
+  const form = await request.formData();
+  const userId = await requireUserId(request);
+  let firstName = form.get("firstName");
+  let lastName = form.get("lastName");
+  let role = form.get("role");
+
+  if (
+    typeof firstName !== "string" ||
+    typeof lastName !== "string" ||
+    typeof role !== "string"
+  ) {
+    return json({ error: `Invalid Form Data` }, { status: 400 });
+  }
+
+  const errors = {
+    firstName: validateName(firstName),
+    lastName: validateName(lastName),
+    role: validateName(role),
+  };
+
+  if (Object.values(errors).some(Boolean))
+    return json(
+      { errors, fields: { role, firstName, lastName } },
+      { status: 400 }
+    );
+
+  await updateUser(userId, { firstName, lastName, role: role as Role });
+
+  return redirect("/home");
+};
 
 export default function ProfileSettings() {
   const { user } = useLoaderData();
@@ -53,6 +62,7 @@ export default function ProfileSettings() {
     firstName: user?.profile?.firstName,
     lastName: user?.profile?.lastName,
     role: user?.profile?.role || "SUPPORTER",
+    profilePicture: user?.profile?.profilePicture || "",
   });
 
   const handleInputChange = (
@@ -69,8 +79,10 @@ export default function ProfileSettings() {
           Your Profile
         </h2>
         <div className="flex">
+          <div className="w-1/3">
+          </div>
           <div className="flex-1">
-            <form method="post">
+            <form method="POST">
               <FormField
                 htmlFor="firstName"
                 label="First Name"
