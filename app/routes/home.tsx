@@ -2,12 +2,13 @@ import { LoaderFunction, json } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import { requireUserId } from "~/utils/auth.server";
 import { getOtherUsers } from "~/utils/user.server";
+import { getFilteredMessages, getRecentMessages } from "~/utils/messages.server";
 import { Layout } from "~/components/layout";
 import { UserPanel } from "~/components/user-panel";
-import { getFilteredMessages } from "~/utils/messages.server";
 import { Message } from "~/components/message";
 import { Message as IMessage, Profile, Prisma } from "@prisma/client";
 import { SearchBar } from '~/components/search-bar'
+import { RecentBar } from '~/components/recent-bar'
 
 interface MessageWithProfile extends IMessage {
   author: {
@@ -21,6 +22,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
   const sort = url.searchParams.get('sort');
   const filter = url.searchParams.get('filter');
+  const recentMessages = await getRecentMessages();
 
   let sortOptions: Prisma.MessageOrderByWithRelationInput = {}
   if (sort) {
@@ -54,11 +56,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const messages = await getFilteredMessages(userId, sortOptions, textFilter);
 
-  return json({ users, messages });
+  return json({ users, messages, recentMessages });
 };
 
 export default function Logout() {
-  const { messages, users } = useLoaderData();
+  const { messages, users, recentMessages } = useLoaderData();
   return (
     <div className="h-screen bg-slate-700 flex justify-center items-center">
       <Layout>
@@ -77,6 +79,7 @@ export default function Logout() {
                   />
                 ))}
               </div>
+              <RecentBar messages={recentMessages} />
             </div>
           </div>
         </div>

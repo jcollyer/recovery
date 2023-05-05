@@ -50,3 +50,25 @@ export const getFilteredMessages = async (
     },
   });
 };
+
+export const getRecentMessages = async () => {
+    return prisma.message.findMany({
+        take: 3,
+        orderBy: {
+            createdAt: 'desc',
+        },
+        select: {
+            style: {
+              select: {
+                emoji: true,
+              },
+            },
+            recipient: {
+              select: {
+                id: true,
+                profile: true,
+              },
+            },
+        },
+    })
+}
