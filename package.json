@@ -3,10 +3,11 @@
   "sideEffects": false,
   "scripts": {
     "typecheck": "tsc",
-    "build": "npm run build:css && remix build",
+    "build": "prisma generate && npm run build:css && remix build",
     "build:css": "tailwindcss -m -i ./styles/app.css -o app/styles/app.css",
     "dev": "concurrently \"npm run dev:css\" \"remix dev\"",
-    "dev:css": "tailwindcss -w -i ./styles/app.css -o app/styles/app.css"
+    "dev:css": "tailwindcss -w -i ./styles/app.css -o app/styles/app.css",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.328.0",
