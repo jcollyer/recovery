@@ -8,7 +8,7 @@ import { getUser } from "~/utils/auth.server";
 import { Modal } from "~/components/modal";
 import { SelectBox } from "~/components/select-box";
 import { colorMap, emojiMap } from "~/utils/constants";
-import { Message } from '~/components/Message';
+import { Message } from '~/components/message';
 import { requireUserId } from '~/utils/auth.server';
 import { createMessage } from "~/utils/messages.server";
 
