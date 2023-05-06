@@ -10,6 +10,7 @@ import { useState } from "react";
 import { useLoaderData } from "@remix-run/react";
 import { Modal } from "~/components/modal";
 import { FormField } from "~/components/form-field";
+import { ImageUploader } from "~/components/image-uploader";
 import { getUser, requireUserId } from "~/utils/auth.server";
 import { validateName } from "~/utils/validators.server";
 import { roles } from "~/utils/constants";
@@ -72,6 +73,20 @@ export default function ProfileSettings() {
     setFormData((form) => ({ ...form, [field]: event.target.value }));
   };
 
+  const handleFileUpload = async (file: File) => {
+    let inputFormData = new FormData();
+    inputFormData.append("profile-pic", file);
+    const response = await fetch("profile/upload", {
+      method: "POST",
+      body: inputFormData,
+    });
+    const { imageUrl } = await response.json();
+    setFormData({
+      ...formData,
+      profilePicture: imageUrl,
+    });
+  };
+
   return (
     <Modal isOpen={true} className="w-1/3">
       <div className="p-3">
@@ -80,6 +95,10 @@ export default function ProfileSettings() {
         </h2>
         <div className="flex">
           <div className="w-1/3">
+            <ImageUploader
+              onChange={handleFileUpload}
+              imageUrl={formData.profilePicture || ""}
+            />
           </div>
           <div className="flex-1">
             <form method="POST">
