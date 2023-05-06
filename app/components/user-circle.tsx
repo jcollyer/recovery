@@ -22,6 +22,7 @@ export function UserCircle({ profile, onClick, className }: props) {
         <h2>
           {profile.firstName.charAt(0).toUpperCase()}
           {profile.lastName.charAt(0).toUpperCase()}
+          
         </h2>
       )}
     </div>
