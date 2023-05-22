@@ -31,3 +31,28 @@ export const getMilestoneById = async (milestoneId: string) => {
     },
   });
 };
+
+export const getRecentMilestones = async () => {
+  return await prisma.milestone.findMany({
+    take: 3,
+    orderBy: {
+      createdAt: 'desc',
+    },
+    select: {
+      title: true,
+      description: true,
+      owner: {
+        select: {
+          id: true,
+          profile: true,
+        },
+      },
+      author: {
+        select: {
+          id: true,
+          profile: true,
+        },
+      },
+    },
+  });
+};

@@ -1,4 +1,4 @@
-import { User, Message } from '@prisma/client'
+import type { User, Message } from '@prisma/client'
 import { UserCircle } from './user-circle'
 import { emojiMap } from '~/utils/constants'
 
@@ -6,7 +6,7 @@ interface MessageWithRecipient extends Message {
   recipient: User
 }
 
-export function RecentBar({ messages }: { messages: MessageWithRecipient[] }) {
+export function RecentMessages({ messages }: { messages: MessageWithRecipient[] }) {
   return (
     <div className="w-1/5 border-l-4 border-l-yellow-300 flex flex-col items-center">
       <h2 className="text-xl text-yellow-300 font-semibold my-6">Recent Messages</h2>
