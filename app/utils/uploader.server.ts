@@ -22,7 +22,8 @@ const uploadStreamToS3 = async (data: AsyncIterable<Uint8Array>, key: string, co
     Key: key,
   }), { expiresIn: 15 * 60 });
 
-  return url;
+  const urlMinusQueryParams = url.substring(0, url.indexOf('jpg?') + 3);
+  return urlMinusQueryParams;
 }
 
 // The UploadHandler gives us an AsyncIterable<Uint8Array>, so we need to convert that to something the aws-sdk can use. 
