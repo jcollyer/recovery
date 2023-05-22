@@ -1,5 +1,5 @@
 import { prisma } from "./prisma.server";
-import { MessageStyle, Prisma } from "@prisma/client";
+import type { MessageStyle, Prisma } from "@prisma/client";
 
 export const createMessage = async (
   message: string,
