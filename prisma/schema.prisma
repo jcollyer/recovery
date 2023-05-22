@@ -44,14 +44,16 @@ type MessageStyle {
 }
 
 model User {
-  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  email              String    @unique
-  password           String
-  profile            Profile
-  authorizedMessages Message[] @relation("AuthorizedMessages")
-  messages           Message[] @relation("RecivedMessage")
+  id                   String      @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  email                String      @unique
+  password             String
+  profile              Profile
+  authorizedMessages   Message[]   @relation("AuthorizedMessages")
+  messages             Message[]   @relation("RecivedMessage")
+  authorizedMilestones Milestone[] @relation("AuthorizedMilestones")
+  milestones           Milestone[] @relation("OwnsMilestone")
 }
 
 model Message {
@@ -63,4 +65,15 @@ model Message {
   authorId    String        @db.ObjectId
   recipient   User          @relation(references: [id], fields: [recipientId], "RecivedMessage")
   recipientId String        @db.ObjectId
+}
+
+model Milestone {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  createdAt   DateTime  @default(now())
+  author      User      @relation(references: [id], fields: [authorId], "AuthorizedMilestones")
+  authorId    String    @db.ObjectId
+  owner       User      @relation(references: [id], fields: [ownerId], "OwnsMilestone")
+  ownerId     String    @db.ObjectId
 }
