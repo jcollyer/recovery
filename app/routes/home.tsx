@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { FaBars, FaCaretRight } from 'react-icons/fa';
 import { LoaderFunction, json } from "@remix-run/node";
 import { Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { getUser, requireUserId } from "~/utils/auth.server";
@@ -75,6 +77,11 @@ export default function Logout() {
   const { messagesToMe, users, recentMessages, recentMilestones, user } =
     useLoaderData();
   const navigate = useNavigate();
+
+  const [navDrawerOpen, setNavDrawerOpen] = useState(false);
+  const toggleNavDrawer = () =>
+    navDrawerOpen ? setNavDrawerOpen(false) : setNavDrawerOpen(true);
+
   return (
     <div className="h-screen bg-slate-700 flex justify-center items-center">
       <Layout>
@@ -82,6 +89,23 @@ export default function Logout() {
         <div className="h-full flex">
           <UserPanel users={users} />
           <div className="flex-1 flex flex-col">
+            <div>
+            <FaBars color="white" onClick={toggleNavDrawer} />
+            </div>
+
+            <nav className={navDrawerOpen ? "block w-1/6 bg-white absolute top-5" : "hidden"}>
+              <ul>
+                <li className="flex">
+                    <span>Link 1</span>
+                    <FaCaretRight />
+                </li>
+                <li className="flex">
+                  <span>item 2</span>
+                  <FaCaretRight />
+                </li>
+              </ul>
+            </nav>
+
             <SearchBar profile={user.profile} />
             <div className="flex-1 flex">
               <RecentMilestones milestones={recentMilestones} />
