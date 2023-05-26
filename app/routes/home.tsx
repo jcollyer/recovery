@@ -2,25 +2,18 @@ import { useState } from "react";
 import { FaBars, FaCaretRight } from "react-icons/fa";
 import { LoaderFunction, json } from "@remix-run/node";
 import { Outlet, useLoaderData, useNavigate } from "@remix-run/react";
-import { getUser, requireUserId } from "~/utils/auth.server";
-import { getOtherUsers } from "~/utils/user.server";
-import { getRecentMilestones } from "~/utils/milestone.server";
+import { UserCircle } from "../components/user-circle";
+import { getUser } from "~/utils/auth.server";
 import { Layout } from "~/components/layout";
-import { UserPanel } from "~/components/user-panel";
-import { SearchBar } from "~/components/search-bar";
-import { RecentMilestones } from "~/components/recentMilestones";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const userId = await requireUserId(request);
   const user = await getUser(request);
-  const users = await getOtherUsers(userId);
-  const recentMilestones = await getRecentMilestones();
 
-  return json({ users, recentMilestones, user });
+  return json({ user });
 };
 
 export default function Logout() {
-  const { users, recentMilestones, user } = useLoaderData();
+  const { user } = useLoaderData();
   const navigate = useNavigate();
 
   const [navDrawerOpen, setNavDrawerOpen] = useState(false);
@@ -28,54 +21,74 @@ export default function Logout() {
     navDrawerOpen ? setNavDrawerOpen(false) : setNavDrawerOpen(true);
 
   return (
-    <div className="h-screen bg-slate-700 flex justify-center items-center">
-      <Layout>
-        <Outlet />
-        <div className="h-full flex">
-          <UserPanel users={users} />
-          <div className="flex-1 flex flex-col">
-            <div>
-              <FaBars color="white" onClick={toggleNavDrawer} />
-            </div>
+    <Layout>
+      <Outlet />
+      <header className="flex bg-gray-300 px-5 py-2">
+        <div className="flex-1 mt-4 relative">
+          <FaBars size="30" color="white" onClick={toggleNavDrawer} />
+          <nav
+            className={
+              navDrawerOpen ? "block w-1/4 bg-white absolute top-10 p-3" : "hidden"
+            }
+          >
+            <ul>
+              <li className="flex p-1">
+                <button onClick={() => navigate("myMessages")}>
+                  My Messages
+                </button>
+                <FaCaretRight />
+              </li>
+              <li className="flex p-1">
+                <button onClick={() => navigate("messages")}>
+                  All Messages
+                </button>
+                <FaCaretRight />
+              </li>
+              <li className="flex p-1">
+                <button onClick={() => navigate("/milestones")}>
+                  All Milestones
+                </button>
+                <FaCaretRight />
+              </li>
+              <li className="flex p-1">
+                <button onClick={() => navigate("messageUsers")}>
+                  Message Users
+                </button>
+                <FaCaretRight />
+              </li>
+            </ul>
+          </nav>
+        </div>
 
-            <nav
-              className={
-                navDrawerOpen ? "block w-1/6 bg-white absolute top-5" : "hidden"
-              }
+        <div className="w-1/4 flex justify-end">
+          <UserCircle
+            className="h-14 w-14 transition duration-300 ease-in-out hover:scale-110 hover:border-2 hover:border-yellow-300"
+            profile={user.profile}
+            onClick={() => navigate("profile")}
+          />
+          <div className="pt-2 pl-3">
+
+          
+          <form action="/logout" method="POST">
+            <button
+              type="submit"
+              className="rounded-xl bg-yellow-300 font-semibold text-blue-600 px-3 py-2 transition duration-300 ease-in-out hover:bg-yellow-400 hover:-translate-y-1"
             >
-              <ul>
-                <li className="flex">
-                  <button onClick={() => navigate("myMessages")}>
-                    My Messages
-                  </button>
-                  <FaCaretRight />
-                </li>
-                <li className="flex">
-                  <button onClick={() => navigate("messages")}>
-                    All Messages
-                  </button>
-                  <FaCaretRight />
-                </li>
-                <li className="flex">
-                  <span>All Milestones</span>
-                  <FaCaretRight />
-                </li>
-              </ul>
-            </nav>
-
-            <SearchBar profile={user.profile} />
-            <div className="flex-1 flex">
-              <RecentMilestones milestones={recentMilestones} />
-              <button
-                onClick={() => navigate(`create/milestone`)}
-                className="rounded-xl bg-yellow-300 font-semibold text-blue-600 px-3 py-2"
-              >
-                Create Milestone
-              </button>
-            </div>
+              Sign Out
+            </button>
+          </form>
           </div>
         </div>
-      </Layout>
-    </div>
+      </header>
+
+      <div>
+        <button
+          onClick={() => navigate(`create/milestone`)}
+          className="rounded-xl bg-yellow-300 font-semibold text-blue-600 px-3 py-2"
+        >
+          Create Milestone
+        </button>
+      </div>
+    </Layout>
   );
 }

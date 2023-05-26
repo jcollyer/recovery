@@ -2,6 +2,7 @@ import { requireUserId } from "~/utils/auth.server";
 import { LoaderFunction, json } from "@remix-run/node";
 import type { Prisma } from "@prisma/client";
 import { getFilteredMessages } from "~/utils/messages.server";
+import { getUser } from "~/utils/auth.server";
 import { useLoaderData } from "@remix-run/react";
 import { MessagesToMe } from "~/components/messagesToMe";
 
@@ -10,6 +11,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const sort = url.searchParams.get("sort");
   const filter = url.searchParams.get("filter");
   const userId = await requireUserId(request);
+  const user = await getUser(request);
 
   let sortOptions: Prisma.MessageOrderByWithRelationInput = {};
   if (sort) {
@@ -55,10 +57,10 @@ export const loader: LoaderFunction = async ({ request }) => {
     textFilter
   );
 
-  return json({ messagesToMe });
+  return json({ messagesToMe, user });
 };
 
 export default function MessagesToMeRoute() {
-  const { messagesToMe } = useLoaderData();
-  return <MessagesToMe messages={messagesToMe} />;
+  const { messagesToMe, user } = useLoaderData();
+  return <MessagesToMe messages={messagesToMe} user={user} />;
 }

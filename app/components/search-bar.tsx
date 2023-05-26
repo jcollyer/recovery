@@ -1,12 +1,11 @@
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import { SelectBox } from "./select-box";
 import { sortOptions } from "~/utils/constants";
-import { UserCircle } from "./user-circle"
-import type { Profile } from "@prisma/client"
+import type { Profile } from "@prisma/client";
 
 interface props {
-    profile: Profile
- }
+  profile: Profile;
+}
 
 export function SearchBar({ profile }: props) {
   const navigate = useNavigate();
@@ -15,7 +14,7 @@ export function SearchBar({ profile }: props) {
   const clearFilters = () => {
     searchParams.delete("filter");
     searchParams.delete("sort");
-    navigate("/home");
+    navigate("/home/myMessages");
   };
 
   return (
@@ -56,13 +55,6 @@ export function SearchBar({ profile }: props) {
           Clear Filters
         </button>
       )}
-      <div className="flex-1">
-      <UserCircle
-            className="h-14 w-14 transition duration-300 ease-in-out hover:scale-110 hover:border-2 hover:border-yellow-300"
-            profile={profile}
-            onClick={() => navigate('profile')}
-         />
-       </div>
       
     </form>
   );
