@@ -1,6 +1,7 @@
 import type { User, Message } from '@prisma/client'
 import { UserCircle } from './user-circle'
 import { emojiMap } from '~/utils/constants'
+import { Modal } from './modal'
 
 interface MessageWithRecipient extends Message {
   recipient: User
@@ -8,7 +9,7 @@ interface MessageWithRecipient extends Message {
 
 export function RecentMessages({ messages }: { messages: MessageWithRecipient[] }) {
   return (
-    <div className="w-1/5 border-l-4 border-l-yellow-300 flex flex-col items-center">
+    <Modal isOpen={true} className="w-1/5 border-l-4 border-l-yellow-300 flex flex-col items-center">
       <h2 className="text-xl text-yellow-300 font-semibold my-6">Recent Messages</h2>
       <div className="h-full flex flex-col gap-y-10 mt-10">
         {messages.map(message => (
@@ -20,6 +21,6 @@ export function RecentMessages({ messages }: { messages: MessageWithRecipient[] 
           </div>
         ))}
       </div>
-    </div>
+    </Modal>
   )
 }
